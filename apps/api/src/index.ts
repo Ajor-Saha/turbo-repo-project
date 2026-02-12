@@ -122,7 +122,7 @@ fastify.post<{
   // Validate encrypted data structure before decryption
   const validation = validateEncryptedData(record);
   if (!validation.valid) {
-    fastify.log.error(`Validation failed for ${id}:`, validation.errors);
+    fastify.log.error(`Validation failed for ${id}: ${JSON.stringify(validation.errors)}`);
     return reply.code(400).send({ 
       error: 'Invalid encrypted data',
       message: 'The encrypted data structure is invalid',
@@ -144,7 +144,7 @@ fastify.post<{
     
     return reply.send(response);
   } catch (error) {
-    fastify.log.error(`Decryption failed for ${id}:`, error);
+    fastify.log.error(`Decryption failed for ${id}: ${error instanceof Error ? error.message : String(error)}`);
     return reply.code(500).send({ 
       error: 'Decryption failed',
       message: error instanceof Error ? error.message : 'Unknown error'
