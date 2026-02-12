@@ -1,0 +1,27 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/index.ts",
+    "build": "tsc",
+    "start": "node --env-file=.env dist/index.js",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@repo/crypto": "workspace:*",
+    "fastify": "^5.2.0",
+    "@fastify/cors": "^10.0.1",
+    "nanoid": "^5.0.0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.2",
+    "eslint": "^9.39.1"
+  }
+}
