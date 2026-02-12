@@ -2,6 +2,11 @@
 
 A production-ready monorepo implementing AES-256-GCM envelope encryption for secure transaction management, built with TurboRepo, Fastify, and Next.js.
 
+## 🔗 Links
+
+- **Live Demo**: [https://turbo-repo-project-web.vercel.app/](https://turbo-repo-project-web.vercel.app/)
+- **Video Walkthrough**: [Watch on Loom](https://www.loom.com/share/5dfd5d7e291a4af7af46eb601d3848f8)
+
 ## Table of Contents
 
 - [Description](#description)
