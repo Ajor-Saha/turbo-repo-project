@@ -2,6 +2,28 @@
 
 Step-by-step guide to deploy both API and Web to Vercel.
 
+## ⚠️ CRITICAL: Environment Variables Required
+
+The API **WILL NOT WORK** without these environment variables set in Vercel:
+
+1. **`MASTER_KEY_HEX`** - Your 64-character hex encryption key
+   - Example: `0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef`
+   - Set this in: Vercel Dashboard → Project Settings → Environment Variables
+
+2. **`FRONTEND_URL`** (optional) - Your frontend URL for CORS
+   - Example: `https://your-frontend.vercel.app`
+   - Default: `http://localhost:3000`
+
+### How to Set Environment Variables in Vercel:
+1. Go to your project on Vercel
+2. Click **Settings** → **Environment Variables**
+3. Add each variable name and value
+4. Select **Production**, **Preview**, and **Development** environments
+5. Click **Save**
+6. **Redeploy** your project (Deployments → ⋯ → Redeploy)
+
+---
+
 ## Prerequisites
 
 1. **Vercel Account**: Sign up at https://vercel.com
