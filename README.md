@@ -115,8 +115,8 @@ Ensure you have the following installed:
 1. **Clone the repository**
 
 ```bash
-git clone <repository-url>
-cd my-turbo-project
+git clone https://github.com/Ajor-Saha/turbo-repo-project.git
+cd turbo-repo-project
 ```
 
 2. **Install dependencies**
@@ -287,11 +287,7 @@ curl -X POST http://localhost:3002/tx/encrypt \
 Additional documentation is available in the `docs/` directory:
 
 - 📖 [API Documentation](docs/API_DOCUMENTATION.md) - Complete API reference with all endpoints
-- 🔐 [Encryption Workflow](docs/ENCRYPTION_WORKFLOW.md) - Visual diagrams of encryption/decryption process
-- 🚀 [Deployment Guide](docs/DEPLOYMENT.md) - Deploy to Vercel
-- ✅ [Submission Checklist](docs/CHECKLIST.md) - Pre-submission checklist
-- ❓ [FAQ](docs/FAQ.md) - Frequently asked questions
-
+- 🔐 [Encryption Workflow](docs/ENCRYPTION_WORKFLOW.md) - Workflow of encryption/decryption process
 ---
 
 ## License
