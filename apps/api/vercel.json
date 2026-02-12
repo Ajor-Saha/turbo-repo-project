@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm build",
+  "buildCommand": "cd ../.. && pnpm turbo build --filter=api",
   "outputDirectory": "dist",
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install"
