@@ -25,7 +25,7 @@ fi
 
 echo ""
 echo "3️⃣ Verifying dist files exist..."
-if [ -f "packages/crypto/dist/index.js" ] && [ -f "apps/api/dist/app.js" ] && [ -f "apps/api/api/index.ts" ]; then
+if [ -f "packages/crypto/dist/index.js" ] && [ -f "apps/api/dist/app.js" ] && [ -f "apps/api/api/index.js" ]; then
     echo "   ✅ All required files present"
 else
     echo "   ❌ Missing required files"

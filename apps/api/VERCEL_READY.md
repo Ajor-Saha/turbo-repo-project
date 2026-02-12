@@ -1,40 +1,66 @@
 # Vercel Deployment - READY ✅
 
-## ✅ Fixed: ERR_MODULE_NOT_FOUND
+## ✅ Fixed: Invalid Export Error
 
-**Root Cause:** ESM (ES Modules) requires file extensions (`.js`) in import statements, but TypeScript doesn't automatically add them when compiling.
+**Error:** `Invalid export found in module "/var/task/apps/api/dist/app.js". The default export must be a function or server.`
 
-**Error:** `Cannot find module '/var/task/packages/crypto/dist/encrypt'`
+**Root Cause:** Vercel was looking at the wrong file. The handler needs to be at `api/index.js` (JavaScript), not TypeScript.
 
-**Solution:** Added `.js` extensions to all relative imports in the crypto package source files.
+**Solution:** Created `api/index.js` as a plain JavaScript file that serves as the Vercel serverless function handler.
 
-## Changes Made
+## Final Structure
 
-### 1. **Added .js Extensions to All Imports**
-   - ✅ Updated `packages/crypto/src/index.ts`
-   - ✅ Updated `packages/crypto/src/encrypt.ts`
-   - ✅ Updated `packages/crypto/src/decrypt.ts`
-   - ✅ Updated all test files
-   - Now: `import { x } from './file.js'` instead of `'./file'`
+```
+apps/api/
+├── api/
+│   └── index.js          ← Vercel serverless handler (JavaScript)
+├── src/
+│   ├── app.ts            ← Fastify app factory (TypeScript)
+│   ├── server.ts         ← Local dev server (TypeScript)
+│   └── ...
+├── dist/                 ← Compiled JavaScript
+│   ├── app.js            ← Compiled Fastify app
+│   └── ...
+├── package.json
+└── vercel.json
+```
 
-### 2. **Crypto Package Compiles to JavaScript**
-   - ✅ TypeScript preserves `.js` extensions in compiled output
-   - ✅ All imports resolve correctly in Node.js ESM runtime
-   - ✅ Vercel can import modules without ERR_MODULE_NOT_FOUND
+## How It Works
 
-### 3. **Verified Build Process**
-   - ✅ `crypto` package builds with `.js` extensions
-   - ✅ `api` package builds successfully
-   - ✅ All imports resolve locally
-   - ✅ Build chain works: crypto → API
+1. **Vercel finds:** `api/index.js` (JavaScript, no compilation needed)
+2. **Handler imports:** `../dist/app.js` (compiled TypeScript)
+3. **App imports:** `@repo/crypto/dist/*.js` (compiled with .js extensions)
+4. **All imports work:** ESM with proper `.js` extensions
 
-## Why .js Extensions Matter
+## All Fixes Applied
 
-In ESM (type: "module"):
-- ❌ `import { x } from './file'` → Module not found
-- ✅ `import { x } from './file.js'` → Works correctly
+### 1. ✅ ESM Import Extensions
+   - Added `.js` to all imports in crypto package
+   - TypeScript preserves extensions in output
 
-TypeScript allows `.js` extensions in `.ts` files for ESM compatibility.
+### 2. ✅ Crypto Package Builds
+   - Compiles to `packages/crypto/dist/*.js`
+   - Proper exports in package.json
+
+### 3. ✅ Vercel Handler is JavaScript
+   - `api/index.js` is plain JavaScript
+   - No TypeScript compilation needed for handler
+   - Exports default function as required by Vercel
+
+### 4. ✅ Build Chain Works
+   - `pnpm turbo build --filter=api` builds crypto, then API
+   - All files compile to JavaScript
+   - Handler imports compiled code
+
+## Verification
+
+```bash
+✅ Handler is a JavaScript function
+✅ Handler imports app.js successfully  
+✅ App creates Fastify instance
+✅ All ESM imports resolve
+✅ Build completes without errors
+```
 
 ## Deploy Instructions
 

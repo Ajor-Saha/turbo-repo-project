@@ -1,7 +1,6 @@
 import { createApp } from '../dist/app.js';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-let app: any;
+let app;
 
 async function getApp() {
   if (!app) {
@@ -11,7 +10,7 @@ async function getApp() {
   return app;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req, res) {
   const fastify = await getApp();
   fastify.server.emit('request', req, res);
 }
