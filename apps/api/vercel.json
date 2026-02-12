@@ -11,9 +11,5 @@
       "src": "/(.*)",
       "dest": "dist/index.js"
     }
-  ],
-  "env": {
-    "MASTER_KEY_HEX": "@master_key_hex",
-    "FRONTEND_URL": "@frontend_url"
-  }
+  ]
 }
