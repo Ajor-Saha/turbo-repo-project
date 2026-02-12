@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateHex, validateEncryptedData } from './validation';
+import { validateHex, validateEncryptedData } from './validation.js';
 
 describe('Validation Functions', () => {
   describe('validateHex', () => {

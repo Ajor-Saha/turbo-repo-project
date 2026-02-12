@@ -1,6 +1,6 @@
 import { createCipheriv, randomBytes } from 'crypto';
-import { getMasterKey, generateDEK } from './masterKey';
-import type { EncryptedData, EnvelopeEncryptResult } from './types';
+import { getMasterKey, generateDEK } from './masterKey.js';
+import type { EncryptedData, EnvelopeEncryptResult } from './types.js';
 
 /**
  * Encrypt data using AES-256-GCM

@@ -1,6 +1,6 @@
 import { createDecipheriv } from 'crypto';
-import { getMasterKey } from './masterKey';
-import type { EnvelopeEncryptResult } from './types';
+import { getMasterKey } from './masterKey.js';
+import type { EnvelopeEncryptResult } from './types.js';
 
 /**
  * Decrypt data using AES-256-GCM

@@ -1,6 +1,6 @@
 // Crypto package - AES-256-GCM Envelope Encryption
-export { envelopeEncrypt } from './encrypt';
-export { envelopeDecrypt } from './decrypt';
-export { validateEncryptedData, validateHex } from './validation';
-export { getMasterKey, generateDEK } from './masterKey';
-export type { EncryptedData, EnvelopeEncryptResult } from './types';
+export { envelopeEncrypt } from './encrypt.js';
+export { envelopeDecrypt } from './decrypt.js';
+export { validateEncryptedData, validateHex } from './validation.js';
+export { getMasterKey, generateDEK } from './masterKey.js';
+export type { EncryptedData, EnvelopeEncryptResult } from './types.js';

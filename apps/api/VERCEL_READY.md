@@ -1,39 +1,40 @@
 # Vercel Deployment - READY ✅
 
-## ✅ Issue Fixed: FUNCTION_INVOCATION_FAILED
+## ✅ Fixed: ERR_MODULE_NOT_FOUND
 
-**Root Cause:** The `@repo/crypto` package was exporting TypeScript files (`.ts`) directly, but Vercel's Node.js runtime cannot execute TypeScript at runtime.
+**Root Cause:** ESM (ES Modules) requires file extensions (`.js`) in import statements, but TypeScript doesn't automatically add them when compiling.
 
-**Solution:** Added build step to compile crypto package to JavaScript before deployment.
+**Error:** `Cannot find module '/var/task/packages/crypto/dist/encrypt'`
+
+**Solution:** Added `.js` extensions to all relative imports in the crypto package source files.
 
 ## Changes Made
 
-### 1. Crypto Package Now Compiles to JavaScript
-- ✅ Added `build` script to crypto/package.json
-- ✅ Added `outDir: "dist"` to crypto/tsconfig.json
-- ✅ Updated exports to point to compiled `.js` files
-- ✅ Now outputs: `dist/*.js` and `dist/*.d.ts`
+### 1. **Added .js Extensions to All Imports**
+   - ✅ Updated `packages/crypto/src/index.ts`
+   - ✅ Updated `packages/crypto/src/encrypt.ts`
+   - ✅ Updated `packages/crypto/src/decrypt.ts`
+   - ✅ Updated all test files
+   - Now: `import { x } from './file.js'` instead of `'./file'`
 
-### 2. Updated Build Process
-- ✅ `turbo.json` includes `dist/**` in outputs
-- ✅ Vercel buildCommand: `pnpm turbo build --filter=api`
-- ✅ This builds crypto first, then API (dependency chain)
+### 2. **Crypto Package Compiles to JavaScript**
+   - ✅ TypeScript preserves `.js` extensions in compiled output
+   - ✅ All imports resolve correctly in Node.js ESM runtime
+   - ✅ Vercel can import modules without ERR_MODULE_NOT_FOUND
 
-### 3. Verified Structure
-- ✅ API handler at `api/index.ts` (Vercel serverless)
-- ✅ Imports from compiled `dist/app.js`
-- ✅ App imports from compiled `@repo/crypto/dist/*.js`
-- ✅ Root route `/` shows API info
-- ✅ Health check at `/health`
+### 3. **Verified Build Process**
+   - ✅ `crypto` package builds with `.js` extensions
+   - ✅ `api` package builds successfully
+   - ✅ All imports resolve locally
+   - ✅ Build chain works: crypto → API
 
-## Build Verification
+## Why .js Extensions Matter
 
-```bash
-✅ crypto package builds to dist/
-✅ API builds to dist/
-✅ All imports resolve to .js files
-✅ No TypeScript files in runtime
-```
+In ESM (type: "module"):
+- ❌ `import { x } from './file'` → Module not found
+- ✅ `import { x } from './file.js'` → Works correctly
+
+TypeScript allows `.js` extensions in `.ts` files for ESM compatibility.
 
 ## Deploy Instructions
 

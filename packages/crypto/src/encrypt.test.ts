@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { envelopeEncrypt } from './encrypt';
-import { envelopeDecrypt } from './decrypt';
+import { envelopeEncrypt } from './encrypt.js';
+import { envelopeDecrypt } from './decrypt.js';
 
 // Set up master key for tests
 beforeAll(() => {
