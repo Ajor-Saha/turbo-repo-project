@@ -20,14 +20,17 @@ ENCRYPT_RESPONSE=$(curl -s -X POST $API_URL/tx/encrypt \
   -d '{"partyId": "party_test", "payload": {"amount": 500, "currency": "AED"}}')
 TX_ID=$(echo $ENCRYPT_RESPONSE | jq -r '.id')
 echo "   Created transaction: $TX_ID"
-echo "   Algorithm: $(echo $ENCRYPT_RESPONSE | jq -r '.alg')"
+echo "   Party ID: $(echo $ENCRYPT_RESPONSE | jq -r '.partyId')"
+echo "   Created At: $(echo $ENCRYPT_RESPONSE | jq -r '.createdAt')"
 echo ""
 
 # Test 3: Fetch Encrypted Record
 echo "3️⃣  Testing Fetch..."
 FETCH_RESPONSE=$(curl -s $API_URL/tx/$TX_ID)
 echo "   Party ID: $(echo $FETCH_RESPONSE | jq -r '.partyId')"
-echo "   Nonce length: $(echo $FETCH_RESPONSE | jq -r '.payload_nonce' | wc -c)"
+echo "   Algorithm: $(echo $FETCH_RESPONSE | jq -r '.alg')"
+echo "   Master Key Version: $(echo $FETCH_RESPONSE | jq -r '.mk_version')"
+echo "   Payload Nonce: $(echo $FETCH_RESPONSE | jq -r '.payload_nonce' | cut -c1-16)..."
 echo ""
 
 # Test 4: Decrypt Transaction

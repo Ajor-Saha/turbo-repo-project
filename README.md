@@ -1,476 +1,300 @@
-# 🔐 Secure Transactions Mini-App
+# Secure Transactions - Envelope Encryption System
 
-> Mirfa Software Engineer Intern Challenge - AES-256-GCM Envelope Encryption
+A production-ready monorepo implementing AES-256-GCM envelope encryption for secure transaction management, built with TurboRepo, Fastify, and Next.js.
 
-A production-ready monorepo for secure transaction encryption using **TurboRepo**, **Fastify**, and **Next.js**.
+## Table of Contents
 
-## 🏗️ Project Structure
+- [Description](#description)
+- [Project Structure](#project-structure)
+- [Tech Stack](#tech-stack)
+- [Quick Start Guide](#quick-start-guide)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
+- [Documentation](#documentation)
+
+---
+
+## Description
+
+This project provides a secure transaction encryption system using envelope encryption with AES-256-GCM algorithm. It consists of:
+
+- **Backend API**: Fastify server handling encryption/decryption operations
+- **Frontend Web**: Next.js application for user interaction
+- **Crypto Package**: Reusable encryption library implementing envelope encryption pattern
+- **Shared Packages**: Common UI components and TypeScript configurations
+
+The system encrypts sensitive transaction data using a Data Encryption Key (DEK), which is then wrapped with a Master Key, ensuring secure key management and enabling key rotation without re-encrypting data.
+
+---
+
+## Project Structure
 
 ```
 my-turbo-project/
 ├── apps/
-│   ├── api/              # Fastify backend (port 3002)
-│   │   ├── src/          # Source code
-│   │   ├── dist/         # Compiled JavaScript
-│   │   ├── build.sh      # Build script
-│   │   └── index.js      # Vercel handler
-│   └── web/              # Next.js frontend (port 3000)
-│       ├── app/          # Next.js app directory
-│       ├── lib/          # API client & utilities
-│       └── types/        # TypeScript definitions
+│   ├── api/                      # Backend API (Fastify)
+│   │   ├── src/
+│   │   │   ├── app.ts           # API routes & handlers
+│   │   │   ├── server.ts        # Server initialization
+│   │   │   ├── storage.ts       # In-memory data storage
+│   │   │   └── types.ts         # TypeScript type definitions
+│   │   ├── index.js             # Vercel serverless handler
+│   │   └── package.json
+│   └── web/                      # Frontend (Next.js)
+│       ├── app/                 # Next.js app directory
+│       ├── lib/
+│       │   └── api.ts           # API client utilities
+│       └── types/
+│           └── index.ts         # Frontend type definitions
 ├── packages/
-│   ├── crypto/           # AES-256-GCM encryption library
-│   │   ├── src/          # Encryption/decryption logic
-│   │   └── dist/         # Compiled output
-│   ├── ui/               # Shared UI components
-│   └── typescript-config/ # Shared TS configs
-├── docs/                 # All documentation
-│   ├── README.md         # Challenge details
-│   ├── DEPLOYMENT.md     # Deployment guide
-│   ├── CHECKLIST.md      # Submission checklist
-│   └── LOOM_GUIDE.md     # Video recording guide
-├── scripts/              # Build & test scripts
-│   ├── test-integration.sh
-│   ├── test-build.sh
-│   └── verify-deployment.sh
-├── start.sh              # Quick start script
-└── turbo.json            # Turborepo configuration
+│   ├── crypto/                   # Encryption library
+│   │   ├── src/
+│   │   │   ├── encrypt.ts       # Envelope encryption logic
+│   │   │   ├── decrypt.ts       # Envelope decryption logic
+│   │   │   ├── validation.ts    # Data validation utilities
+│   │   │   ├── masterKey.ts     # Key management
+│   │   │   └── types.ts         # Crypto type definitions
+│   │   └── vitest.config.ts     # Test configuration
+│   ├── ui/                       # Shared UI components
+│   ├── eslint-config/           # Shared ESLint configs
+│   └── typescript-config/       # Shared TypeScript configs
+├── docs/                         # Project documentation
+├── scripts/                      # Build & test scripts
+└── turbo.json                    # TurboRepo configuration
 ```
 
-## 🚀 Quick Start
+---
+
+## Tech Stack
+
+### Core Technologies
+
+- **Monorepo**: TurboRepo 2.8+
+- **Language**: TypeScript 5.9
+- **Package Manager**: pnpm 9.0
+
+### Backend
+
+- **Framework**: Fastify 5.2
+- **CORS**: @fastify/cors 10.0
+- **ID Generation**: nanoid 5.0
+- **Encryption**: Node.js Crypto (built-in)
+
+### Frontend
+
+- **Framework**: Next.js 15
+- **Runtime**: React 19
+- **Styling**: CSS Modules
+
+### Development & Testing
+
+- **Build Tool**: TurboRepo
+- **Testing**: Vitest
+- **Linting**: ESLint 9
+- **Type Checking**: TypeScript
+
+### Deployment
+
+- **Platform**: Vercel
+- **API**: Vercel Serverless Functions
+- **Web**: Vercel Static Hosting
+
+---
+
+## Quick Start Guide
 
 ### Prerequisites
-- Node.js 20+
-- pnpm 8+
 
-### Install & Run
+Ensure you have the following installed:
+
+- **Node.js**: v20 or higher
+- **pnpm**: v9.0 or higher
+
+### Installation
+
+1. **Clone the repository**
 
 ```bash
-# Install dependencies
+git clone <repository-url>
+cd my-turbo-project
+```
+
+2. **Install dependencies**
+
+```bash
 pnpm install
-
-# Start all apps (Turbo will handle everything)
-pnpm dev
-
-# Or use the start script
-./start.sh
 ```
 
-**Access:**
-- **Frontend:** http://localhost:3000
-- **API:** http://localhost:3002
+3. **Set up environment variables**
 
-### Run Tests
+Create `.env` file in `apps/api/`:
 
-```bash
-# Run all tests
-pnpm test
-
-# Run crypto package tests only
-cd packages/crypto && pnpm test
-```
-
-## 🔐 How It Works
-
-### Envelope Encryption (AES-256-GCM)
-
-1. **Generate** random 32-byte DEK (Data Encryption Key)
-2. **Encrypt** payload with DEK using AES-256-GCM
-3. **Wrap** DEK with Master Key using AES-256-GCM
-4. **Store** encrypted payload + wrapped DEK + nonces + auth tags
-
-**Decryption reverses the process:**
-1. Unwrap DEK using Master Key
-2. Decrypt payload using DEK
-3. Return original JSON
-
-### Data Model
-
-```typescript
-type TxSecureRecord = {
-  id: string
-  partyId: string
-  createdAt: string
-  
-  // Payload encrypted with DEK
-  payload_nonce: string   // 12 bytes (24 hex)
-  payload_ct: string      // variable length
-  payload_tag: string     // 16 bytes (32 hex)
-  
-  // DEK wrapped with Master Key
-  dek_wrap_nonce: string  // 12 bytes (24 hex)
-  dek_wrapped: string     // 64 hex chars
-  dek_wrap_tag: string    // 16 bytes (32 hex)
-  
-  alg: "AES-256-GCM"
-  mk_version: 1
-}
-```
-
-## 📡 API Endpoints
-
-### `POST /tx/encrypt`
-Encrypts and stores a transaction.
-
-**Request:**
-```json
-{
-  "partyId": "party_123",
-  "payload": {"amount": 100, "currency": "AED"}
-}
-```
-
-**Response:** Complete encrypted record
-
-### `GET /tx/:id`
-Retrieves encrypted record (no decryption).
-
-### `POST /tx/:id/decrypt`
-Decrypts and returns original payload.
-
-**Response:**
-```json
-{
-  "id": "...",
-  "partyId": "party_123",
-  "payload": {"amount": 100, "currency": "AED"}
-}
-```
-
-## 🧪 Testing
-
-**14 tests implemented** (exceeds minimum requirement of 5):
-
-✅ Encryption/Decryption tests (7):
-- Encrypt → decrypt round-trip
-- Tampered ciphertext detection
-- Tampered tag detection  
-- Invalid nonce length rejection
-- Random nonce generation
-- Complex nested payloads
-- DEK wrapper tampering
-
-✅ Validation tests (7):
-- Hex string validation
-- Invalid length detection
-- Non-hex character rejection
-- Complete record validation
-- Multiple error reporting
-
-**Run tests:**
-```bash
-cd packages/crypto && pnpm test
-```
-
-## 🎯 Validation Rules
-
-The system rejects decryption if:
-- ❌ Nonce is not 12 bytes
-- ❌ Tag is not 16 bytes
-- ❌ Invalid hex characters
-- ❌ Ciphertext tampered
-- ❌ Tag tampered
-- ❌ Decryption fails (authentication error)
-
-## 🚀 Deployment to Vercel
-
-### 1. Deploy API
-
-```bash
-cd apps/api
-vercel --prod
-```
-
-Set environment variable:
-- `MASTER_KEY_HEX` = 64-character hex string (32 bytes)
-
-### 2. Deploy Web
-
-```bash
-cd apps/web
-vercel --prod
-```
-
-Set environment variable:
-- `NEXT_PUBLIC_API_URL` = your deployed API URL
-
-### Environment Variables
-
-**API (.env):**
 ```env
 PORT=3002
 MASTER_KEY_HEX=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 FRONTEND_URL=http://localhost:3000
 ```
 
-**Web (.env.local):**
+> **Note**: Generate a secure 64-character hex string for `MASTER_KEY_HEX` in production.
+
+Create `.env.local` file in `apps/web/`:
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3002
 ```
 
-## 🏛️ Architecture
+### Running Locally
 
-### Monorepo Structure
-- **TurboRepo** manages builds and dev servers
-- **Shared packages** for crypto logic and configs
-- **TypeScript** across all packages
-- **pnpm workspaces** for dependency management
-
-### Security Features
-- ✅ Envelope encryption for key rotation
-- ✅ GCM mode for authenticated encryption
-- ✅ Random nonces (never reused)
-- ✅ Validation before decryption
-- ✅ Hex encoding for storage
-- ✅ Master key from environment
-
-## 📦 Tech Stack
-
-- **Monorepo:** TurboRepo
-- **Backend:** Fastify 5
-- **Frontend:** Next.js 15 + React 19
-- **Crypto:** Node.js crypto (AES-256-GCM)
-- **Testing:** Vitest
-- **Language:** TypeScript 5
-- **Package Manager:** pnpm
-- **Deployment:** Vercel
-
-## 🎨 Features
-
-### Frontend
-- Real-time JSON validation
-- Encrypt transactions
-- Fetch encrypted records
-- Decrypt payloads
-- Error handling
-- Dark theme UI
-
-### Backend  
-- Fast API with Fastify
-- In-memory storage
-- Comprehensive logging
-- CORS enabled
-- Error handling
-- Type-safe
-
-### Crypto Package
-- Envelope encryption
-- Validation utilities
-- Type definitions
-- Fully tested
-- Reusable across apps
-
-## 📚 Scripts
+**Start all applications (recommended):**
 
 ```bash
-# Development
-pnpm dev          # Start all apps
-pnpm build        # Build all apps
-pnpm lint         # Lint all packages
-pnpm test         # Run all tests
-
-# Individual apps
-cd apps/api && pnpm dev      # API only
-cd apps/web && pnpm dev      # Web only
-
-# Testing
-./scripts/test-integration.sh        # Full integration test
-cd apps/api && ./test-api.sh # API tests
+pnpm dev
 ```
 
-## 🐛 Known Issues & Solutions
+This starts:
+- Backend API on `http://localhost:3002`
+- Frontend on `http://localhost:3000`
 
-### Port Already in Use
+**Or start individually:**
+
 ```bash
-# Kill processes on ports 3000 and 3002
-lsof -ti:3000 | xargs kill -9
-lsof -ti:3002 | xargs kill -9
+# Backend only
+pnpm --filter api dev
+
+# Frontend only
+pnpm --filter web dev
 ```
 
-### Master Key Not Found
-Ensure `.env` file exists in `apps/api/` with `MASTER_KEY_HEX`
+### Building for Production
 
-## 🔧 Development
-
-### Adding a New Package
 ```bash
-cd packages
-mkdir my-package
-cd my-package
-pnpm init
+# Build all packages
+pnpm build
+
+# Build specific app
+pnpm --filter api build
+pnpm --filter web build
 ```
 
-Update `pnpm-workspace.yaml` if needed.
+---
 
-### Using the Crypto Package
-```typescript
-import { envelopeEncrypt, envelopeDecrypt } from '@repo/crypto/index';
+## Testing
 
-const encrypted = envelopeEncrypt({ data: 'secret' });
-const decrypted = envelopeDecrypt(encrypted);
+### Running Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Run crypto package tests (14 test cases)
+cd packages/crypto
+pnpm test
 ```
 
-## 📖 Documentation
+### API Integration Tests
 
-- **API:** [apps/api/README.md](apps/api/README.md)
-- **Web:** [apps/web/README.md](apps/web/README.md)
-- **Deployment Guide:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
-- **Loom Guide:** [docs/LOOM_GUIDE.md](docs/LOOM_GUIDE.md)
-- **Checklist:** [docs/CHECKLIST.md](docs/CHECKLIST.md)
-- **Challenge Details:** [docs/README.md](docs/README.md)
+The project includes comprehensive API integration tests that verify all endpoints are working correctly.
 
-## ✅ Submission Checklist
+📄 **Test Suite**: [scripts/test-api.sh](scripts/test-api.sh)
 
-Before submitting:
-- [ ] Tests pass (`pnpm test`)
-- [ ] Integration test passes (`./scripts/test-integration.sh`)
-- [ ] API deployed to Vercel
-- [ ] Web deployed to Vercel
-- [ ] Both URLs working
-- [ ] GitHub repo created & pushed
-- [ ] Loom video recorded (3-6 min)
-- [ ] Form submitted: https://forms.gle/YeGkQdRGQCZcKG3g7
+**Test Cases Covered:**
+1. ✅ Health Check - Verify API is running
+2. ✅ Encrypt Transaction - Create and encrypt transaction
+3. ✅ Fetch Encrypted Record - Retrieve encrypted data
+4. ✅ Decrypt Transaction - Decrypt and verify payload
+5. ✅ List All Transactions - Check listing functionality
+6. ✅ Error Handling - Validate 404 responses
 
-See [docs/CHECKLIST.md](docs/CHECKLIST.md) for detailed checklist.
+**Prerequisites:**
+- API server must be running on `http://localhost:3002`
+- `jq` must be installed (for JSON parsing)
 
-## 👥 Author
+**Install jq (if needed):**
+```bash
+# macOS
+brew install jq
 
-Built for the Mirfa Software Engineer Intern Challenge
-
-## 📄 License
-
-MIT
-
-This Turborepo starter is maintained by the Turborepo core team.
-
-## Using this example
-
-Run the following command:
-
-```sh
-npx create-turbo@latest
+# Ubuntu/Debian
+sudo apt-get install jq
 ```
 
-## What's inside?
+**Run API Tests:**
 
-This Turborepo includes the following packages/apps:
+```bash
+# Make script executable (first time only)
+chmod +x scripts/test-api.sh
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+# Run the tests
+./scripts/test-api.sh
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+**Or run from scripts directory:**
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+```bash
+cd scripts
+./test-api.sh
 ```
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+### Accessing the Application
 
-```
-cd my-turborepo
+- **Web Interface**: http://localhost:3000
+- **API Endpoint**: http://localhost:3002
+- **API Health Check**: http://localhost:3002/health
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+---
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+## API Documentation
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Comprehensive API documentation is available at:
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+📄 [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+For visual workflow diagrams of the encryption/decryption process:
 
-### Remote Caching
+🔐 [docs/ENCRYPTION_WORKFLOW.md](docs/ENCRYPTION_WORKFLOW.md)
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+### Quick API Overview
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | API information and available endpoints |
+| `/health` | GET | Health check and system status |
+| `/tx/encrypt` | POST | Encrypt and store a transaction |
+| `/tx/:id` | GET | Retrieve encrypted transaction |
+| `/tx/:id/decrypt` | POST | Decrypt a transaction |
+| `/tx` | GET | List all transactions |
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+**Example: Encrypt a transaction**
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```bash
+curl -X POST http://localhost:3002/tx/encrypt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "partyId": "party-123",
+    "payload": {
+      "amount": 1000.50,
+      "currency": "USD"
+    }
+  }'
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+---
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+## Documentation
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+Additional documentation is available in the `docs/` directory:
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+- 📖 [API Documentation](docs/API_DOCUMENTATION.md) - Complete API reference with all endpoints
+- 🔐 [Encryption Workflow](docs/ENCRYPTION_WORKFLOW.md) - Visual diagrams of encryption/decryption process
+- 🚀 [Deployment Guide](docs/DEPLOYMENT.md) - Deploy to Vercel
+- ✅ [Submission Checklist](docs/CHECKLIST.md) - Pre-submission checklist
+- ❓ [FAQ](docs/FAQ.md) - Frequently asked questions
 
-## Useful Links
+---
 
-Learn more about the power of Turborepo:
+## License
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+This project is part of the Mirfa Software Engineer Intern Challenge.
+
