@@ -17,6 +17,23 @@ export function createApp() {
     origin: process.env.FRONTEND_URL || 'http://localhost:3000'
   });
 
+  // Root endpoint
+  fastify.get('/', async () => {
+    return { 
+      name: 'Secure Transactions API',
+      version: '1.0.0',
+      status: 'running',
+      endpoints: {
+        health: 'GET /health',
+        encrypt: 'POST /tx/encrypt',
+        retrieve: 'GET /tx/:id',
+        decrypt: 'POST /tx/:id/decrypt',
+        list: 'GET /tx'
+      },
+      timestamp: new Date().toISOString()
+    };
+  });
+
   // Health check endpoint
   fastify.get('/health', async () => {
     return { 
