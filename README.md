@@ -9,13 +9,32 @@ A production-ready monorepo for secure transaction encryption using **TurboRepo*
 ```
 my-turbo-project/
 ├── apps/
-│   ├── api/          # Fastify backend (port 3002)
-│   └── web/          # Next.js frontend (port 3000)
+│   ├── api/              # Fastify backend (port 3002)
+│   │   ├── src/          # Source code
+│   │   ├── dist/         # Compiled JavaScript
+│   │   ├── build.sh      # Build script
+│   │   └── index.js      # Vercel handler
+│   └── web/              # Next.js frontend (port 3000)
+│       ├── app/          # Next.js app directory
+│       ├── lib/          # API client & utilities
+│       └── types/        # TypeScript definitions
 ├── packages/
-│   ├── crypto/       # AES-256-GCM encryption library
-│   ├── ui/           # Shared UI components
-│   └── typescript-config/  # Shared TS configs
-└── turbo.json        # Turborepo configuration
+│   ├── crypto/           # AES-256-GCM encryption library
+│   │   ├── src/          # Encryption/decryption logic
+│   │   └── dist/         # Compiled output
+│   ├── ui/               # Shared UI components
+│   └── typescript-config/ # Shared TS configs
+├── docs/                 # All documentation
+│   ├── README.md         # Challenge details
+│   ├── DEPLOYMENT.md     # Deployment guide
+│   ├── CHECKLIST.md      # Submission checklist
+│   └── LOOM_GUIDE.md     # Video recording guide
+├── scripts/              # Build & test scripts
+│   ├── test-integration.sh
+│   ├── test-build.sh
+│   └── verify-deployment.sh
+├── start.sh              # Quick start script
+└── turbo.json            # Turborepo configuration
 ```
 
 ## 🚀 Quick Start
@@ -255,7 +274,7 @@ cd apps/api && pnpm dev      # API only
 cd apps/web && pnpm dev      # Web only
 
 # Testing
-./test-integration.sh        # Full integration test
+./scripts/test-integration.sh        # Full integration test
 cd apps/api && ./test-api.sh # API tests
 ```
 
@@ -295,19 +314,24 @@ const decrypted = envelopeDecrypt(encrypted);
 
 - **API:** [apps/api/README.md](apps/api/README.md)
 - **Web:** [apps/web/README.md](apps/web/README.md)
-- **Challenge:** [others/README.md](others/README.md)
+- **Deployment Guide:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+- **Loom Guide:** [docs/LOOM_GUIDE.md](docs/LOOM_GUIDE.md)
+- **Checklist:** [docs/CHECKLIST.md](docs/CHECKLIST.md)
+- **Challenge Details:** [docs/README.md](docs/README.md)
 
 ## ✅ Submission Checklist
 
 Before submitting:
 - [ ] Tests pass (`pnpm test`)
-- [ ] Integration test passes (`./test-integration.sh`)
+- [ ] Integration test passes (`./scripts/test-integration.sh`)
 - [ ] API deployed to Vercel
 - [ ] Web deployed to Vercel
 - [ ] Both URLs working
 - [ ] GitHub repo created & pushed
 - [ ] Loom video recorded (3-6 min)
 - [ ] Form submitted: https://forms.gle/YeGkQdRGQCZcKG3g7
+
+See [docs/CHECKLIST.md](docs/CHECKLIST.md) for detailed checklist.
 
 ## 👥 Author
 

@@ -1,18 +1,5 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "index.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.js"
-    }
-  ],
-  "buildCommand": "cd ../.. && pnpm turbo build --filter=api",
-  "devCommand": "pnpm dev",
+  "buildCommand": "bash build.sh",
+  "outputDirectory": ".",
   "installCommand": "pnpm install"
 }

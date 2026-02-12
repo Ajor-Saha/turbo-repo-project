@@ -63,7 +63,7 @@ fi
 
 echo ""
 echo "5️⃣ Checking vercel.json..."
-if grep -q '"src": "index.js"' vercel.json; then
+if grep -q 'buildCommand' vercel.json; then
     echo "   ✅ Vercel config correct"
 else  
     echo "   ❌ Vercel config wrong"

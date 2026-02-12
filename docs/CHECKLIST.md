@@ -60,7 +60,7 @@ All 6 validation rules implemented:
   - [x] 7 encryption tests
   - [x] 7 validation tests
 - [x] Tests pass: `pnpm test`
-- [x] Integration test passes: `./test-integration.sh`
+- [x] Integration test passes: `./scripts/test-integration.sh`
 
 ### ✅ Monorepo Structure
 - [x] TurboRepo configured
@@ -181,7 +181,7 @@ pnpm dev
 # Then visit http://localhost:3000 and test the flow
 
 # 5. Integration test
-./test-integration.sh
+./scripts/test-integration.sh
 ```
 
 All should pass ✅

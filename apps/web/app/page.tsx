@@ -2,24 +2,22 @@
 
 import { useState } from 'react';
 import styles from './page.module.css';
-
-interface Transaction {
-  id: string;
-  partyId: string;
-  alg: string;
-  createdAt: string;
-}
+import type { Transaction, ResultData } from '@/types';
+import { 
+  encryptTransaction, 
+  fetchTransaction, 
+  decryptTransaction,
+  handleApiError 
+} from '@/lib/api';
 
 export default function Home() {
   const [partyId, setPartyId] = useState('party_123');
   const [payload, setPayload] = useState('{\n  "amount": 100,\n  "currency": "AED"\n}');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedId, setSelectedId] = useState('');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ResultData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
   
   const handleEncrypt = async () => {
     setLoading(true);
@@ -29,27 +27,13 @@ export default function Home() {
       // Validate JSON
       const parsedPayload = JSON.parse(payload);
       
-      const res = await fetch(`${API_URL}/tx/encrypt`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          partyId,
-          payload: parsedPayload
-        })
-      });
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Encryption failed');
-      }
-      
-      const data = await res.json();
+      const data = await encryptTransaction(partyId, parsedPayload);
       
       // Add to transactions list
       setTransactions(prev => [{
         id: data.id,
         partyId: data.partyId,
-        alg: data.alg,
+        alg: data.alg || 'AES-256-GCM', // Hardcode if backend doesn't return it
         createdAt: data.createdAt
       }, ...prev]);
       
@@ -58,7 +42,7 @@ export default function Home() {
       // Reset form
       setPayload('{\n  "amount": 100,\n  "currency": "AED"\n}');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid JSON or network error');
+      setError(err instanceof Error ? err.message : handleApiError(err));
       setResult(null);
     } finally {
       setLoading(false);
@@ -75,17 +59,10 @@ export default function Home() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/tx/${txId}`);
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Fetch failed');
-      }
-      
-      const data = await res.json();
+      const data = await fetchTransaction(txId);
       setResult({ type: 'fetch', data });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Network error');
+      setError(handleApiError(err));
       setResult(null);
     } finally {
       setLoading(false);
@@ -102,19 +79,10 @@ export default function Home() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/tx/${txId}/decrypt`, {
-        method: 'POST'
-      });
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Decryption failed');
-      }
-      
-      const data = await res.json();
+      const data = await decryptTransaction(txId);
       setResult({ type: 'decrypt', data });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Network error');
+      setError(handleApiError(err));
       setResult(null);
     } finally {
       setLoading(false);
@@ -292,7 +260,7 @@ export default function Home() {
                 <div className={styles.info}>
                   <p><strong>✓</strong> Transaction encrypted and stored securely</p>
                   <p><strong>ID:</strong> <code>{result.data.id}</code></p>
-                  <p><strong>Algorithm:</strong> {result.data.alg}</p>
+                  <p><strong>Algorithm:</strong> {result.data.alg || 'AES-256-GCM'}</p>
                 </div>
               )}
               
@@ -307,7 +275,6 @@ export default function Home() {
         
         <footer className={styles.footer}>
           <p>🔐 AES-256-GCM Envelope Encryption • Built with Fastify & Next.js • TurboRepo Monorepo</p>
-          <p>API: <code>{API_URL}</code></p>
         </footer>
       </main>
     </div>
